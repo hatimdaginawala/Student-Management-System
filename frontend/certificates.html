@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificates - Student Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .certificate-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .cert-stat-card {
+            position: relative;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        .cert-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gray-300);
+        }
+        .cert-stat-card[data-filter="Certificate Pending"]::before { background: var(--gold-600); }
+        .cert-stat-card[data-filter="Applied"]::before { background: var(--slate-600); }
+        .cert-stat-card[data-filter="Received"]::before { background: var(--brand-600); }
+        .cert-stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        .cert-stat-card.active-filter {
+            border-color: var(--brand-500);
+            box-shadow: 0 0 0 3px var(--brand-100);
+        }
+        .cert-stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid currentColor;
+        }
+        .cert-stat-icon svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+        .cert-stat-icon.total { color: var(--text-secondary); }
+        .cert-stat-icon.pending { color: var(--gold-600); }
+        .cert-stat-icon.applied { color: var(--slate-600); }
+        .cert-stat-icon.received { color: var(--brand-600); }
+        .cert-stat-info h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 6px 0; }
+        .cert-stat-info p { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 1.4rem; font-weight: 600; margin: 0; line-height: 1.2; }
+        .cert-stat-info small { color: var(--text-secondary); font-size: 0.78rem; }
+        .cert-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 20px; font-size: 0.76rem; font-weight: 600; }
+        .cert-status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+        .cert-status-pending { background: var(--gold-100); color: var(--gold-700); }
+        .cert-status-applied { background: var(--slate-100); color: var(--slate-700); }
+        .cert-status-received { background: var(--brand-100); color: var(--brand-800); }
+        .cert-number { font-family: var(--font-mono); font-size: 0.85rem; color: var(--brand-700); font-weight: 600; }
+        .quick-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid;
+            transition: var(--transition);
+            font-family: var(--font-body);
+        }
+        .quick-action-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .quick-action-btn.apply { background: var(--slate-100); color: var(--slate-700); border-color: var(--slate-600); }
+        .quick-action-btn.apply:hover { background: var(--slate-600); color: #fff; }
+        .quick-action-btn.receive { background: var(--brand-100); color: var(--brand-800); border-color: var(--brand-600); }
+        .quick-action-btn.receive:hover { background: var(--brand-600); color: #fff; }
+        .quick-action-btn.reset { background: var(--brick-100); color: var(--brick-700); border-color: var(--brick-600); }
+        .quick-action-btn.reset:hover { background: var(--brick-600); color: #fff; }
+        .btn-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+        /* Locked / finalized state — shown once a certificate is Received,
+           in place of the Apply / Receive / Reset quick actions */
+        .cert-locked-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: var(--gray-100);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .cert-locked-note svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+
+        /* Export button style */
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--brand-600);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-body);
+        }
+        .btn-export:hover {
+            background: var(--brand-700);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-export svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+        .btn-export:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Export modal styles */
+        .export-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .export-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--brand-50);
+            border: 1px solid var(--brand-200);
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: var(--brand-800);
+        }
+        .export-info svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .certificate-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-mark">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 18V13M11 18V9M18 18V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4 13L11 9L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2>SMS</h2>
+                    <p>Student Management</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="admin-restricted">
+                        <a href="dashboard.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="3" width="7" height="9" rx="1.5"/>
+                                    <rect x="14" y="3" width="7" height="5" rx="1.5"/>
+                                    <rect x="14" y="12" width="7" height="9" rx="1.5"/>
+                                    <rect x="3" y="16" width="7" height="5" rx="1.5"/>
+                                </svg>
+                            </span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="students.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="8" r="3.5"/>
+                                    <path d="M4.5 20c0-3.6 3.36-6.5 7.5-6.5s7.5 2.9 7.5 6.5"/>
+                                </svg>
+                            </span>
+                            Students
+                        </a>
+                    </li>
+                                                            <li>
+                        <a href="inquiries.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 4.5h16v11.5a1.5 1.5 0 0 1-1.5 1.5H9l-4.5 4V4.5Z" stroke-linejoin="round"/>
+                                    <path d="M8 9h8M8 12.5h5"/>
+                                </svg>
+                            </span>
+                            Inquiries
+                        </a>
+                    </li>
+                    <li>
+                        <a href="batches.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 5.5C4 4.67 4.67 4 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z"/>
+                                    <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H12v16h6.5c.83 0 1.5-.67 1.5-1.5v-13Z"/>
+                                </svg>
+                            </span>
+                            Batches
+                        </a>
+                    </li>
+                    <li>
+                        <a href="enrollments.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="3.5" width="14" height="17" rx="1.5"/>
+                                    <path d="M9 3.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v.5"/>
+                                    <path d="M8.5 11l2 2 4-4.5M8.5 16.5h7"/>
+                                </svg>
+                            </span>
+                            Enrollments
+                        </a>
+                    </li>
+                    <li>
+                        <a href="certificates.html" class="active">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3.5" y="3.5" width="17" height="17" rx="2"/>
+                                    <path d="M8.5 12l2.3 2.3L15.5 9.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            Certificates
+                        </a>
+                    </li>
+                    <li class="admin-restricted">
+                        <a href="payments.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="6" width="18" height="13" rx="2"/>
+                                    <path d="M3 10h18"/>
+                                    <path d="M7 14.5h4"/>
+                                </svg>
+                            </span>
+                            Payments
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="expenses.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 3v3M12 18v3"/>
+                                    <circle cx="12" cy="12" r="8"/>
+                                    <path d="M9.5 15c0 1.1 1.1 2 2.5 2s2.5-.7 2.5-1.8-1.1-1.6-2.5-1.9-2.5-.8-2.5-1.9S10.6 9.6 12 9.6s2.5.7 2.5 1.7"/>
+                                </svg>
+                            </span>
+                            Expenses
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="staff.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="8.5" cy="7.5" r="3"/>
+                                    <path d="M2.5 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+                                    <path d="M15.5 4.7a3 3 0 0 1 0 5.6"/>
+                                    <path d="M17.5 14.3c2.2.55 3.8 2.4 3.8 5.7"/>
+                                </svg>
+                            </span>
+                            Staff
+                        </a>
+                    </li>
+                    <li class="admin-restricted">
+                        <a href="reports.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 20V10M11 20V4M18 20v-7"/>
+                                </svg>
+                            </span>
+                            Reports
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="users.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="9" cy="8" r="3"/>
+                                    <path d="M3 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/>
+                                    <path d="M16 8.5a2.75 2.75 0 1 0 0-5.5"/>
+                                    <path d="M18.5 14c2.03.51 3.5 2.2 3.5 4.5"/>
+                                </svg>
+                            </span>
+                            Users
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">SA</div>
+                    <div class="user-details">
+                        <h4 id="userName">Admin</h4>
+                        <p id="userRole">Admin</p>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-block" id="logoutBtn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.12);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.75">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">Certificate Management</h1>
+                </div>
+                <div class="header-right">
+                    <button class="btn-export" id="exportCsvBtn" title="Export to CSV">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 17v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/>
+                            <path d="M12 3v11"/>
+                            <path d="M8 10l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Export CSV
+                    </button>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.75">
+                            <circle cx="12" cy="12" r="4.5"/>
+                            <path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Certificate Stats -->
+                <div class="certificate-stats" id="certificateStats">
+                    <div class="cert-stat-card" data-filter="all">
+                        <div class="cert-stat-icon total">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M9 3.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v.5"/><path d="M8.5 11.5h7M8.5 15h5"/></svg>
+                        </div>
+                        <div class="cert-stat-info"><h4>Total Students</h4><p id="statTotal">0</p></div>
+                    </div>
+                    <div class="cert-stat-card" data-filter="Certificate Pending">
+                        <div class="cert-stat-icon pending">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="cert-stat-info"><h4>Pending</h4><p id="statPending">0</p><small id="statPendingPct">0%</small></div>
+                    </div>
+                    <div class="cert-stat-card" data-filter="Applied">
+                        <div class="cert-stat-icon applied">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="cert-stat-info"><h4>Applied</h4><p id="statApplied">0</p><small id="statAppliedPct">0%</small></div>
+                    </div>
+                    <div class="cert-stat-card" data-filter="Received">
+                        <div class="cert-stat-icon received">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="cert-stat-info"><h4>Received</h4><p id="statReceived">0</p><small id="statReceivedPct">0%</small></div>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="search-box">
+                            <span class="search-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="10.5" cy="10.5" r="6.5"/>
+                                    <path d="M20 20l-4.5-4.5" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            <input type="text" id="searchInput" placeholder="Search by name, ID, Aadhar...">
+                        </div>
+                        <select id="certStatusFilter" class="form-control" style="width:auto;">
+                            <option value="">All Certificate Status</option>
+                            <option value="Certificate Pending">Pending</option>
+                            <option value="Applied">Applied</option>
+                            <option value="Received">Received</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Students Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Batch</th>
+                                        <th>Mobile</th>
+                                        <th>Certificate Status</th>
+                                        <th>Certificate No</th>
+                                        <th>Applied Date</th>
+                                        <th>Received Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="certTableBody">
+                                    <tr><td colspan="9" class="text-center"><div class="spinner spinner-dark"></div> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Update Certificate Modal -->
+    <div class="modal-overlay" id="certModal" style="display:none;">
+        <div class="modal" style="max-width:480px;">
+            <div class="modal-header">
+                <h3 id="certModalTitle">Update Certificate</h3>
+                <button class="modal-close" id="closeCertModal">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="certForm">
+                    <input type="hidden" id="certStudentId">
+                    <div id="certStudentInfo" style="margin-bottom:16px;padding:12px;background:var(--gray-50);border-radius:var(--border-radius);font-size:0.9rem;"></div>
+                    <div class="form-group">
+                        <label for="certStatus">Certificate Status *</label>
+                        <select id="certStatus" class="form-control" required>
+                            <option value="Certificate Pending">Certificate Pending</option>
+                            <option value="Applied">Applied</option>
+                            <option value="Received">Received</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="certNumberGroup" style="display:none;">
+                        <label for="certNumber">Certificate Number</label>
+                        <input type="text" id="certNumber" class="form-control" placeholder="e.g., CERT-WEB-2024-001">
+                    </div>
+                    <div class="form-group" id="certModalError" style="display:none;"><div class="alert alert-error"></div></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelCertBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveCertBtn">
+                    <span id="saveCertBtnText">Update Status</span>
+                    <span class="spinner" id="certSaveSpinner" style="display:none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export CSV Modal -->
+    <div class="modal-overlay" id="exportModal" style="display:none;">
+        <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+                <h3>Export Students Data</h3>
+                <button class="modal-close" id="closeExportModal">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="export-info">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Exporting data for <strong id="exportStudentCount">0</strong> students</span>
+                </div>
+                <div class="form-group">
+                    <label>CSV Preview (first 5 rows)</label>
+                    <div class="export-preview" id="csvPreview">
+                        <span class="text-muted">Loading preview...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelExportBtn">Cancel</button>
+                <button class="btn btn-primary" id="downloadCsvBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2">
+                        <path d="M4 17v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/>
+                        <path d="M12 3v11"/>
+                        <path d="M8 10l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Download CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/certificates.js"></script>
+</body>
+</html>

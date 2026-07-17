@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff - Student Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .staff-avatar-sm {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(155deg, var(--brand-500), var(--brand-700));
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+        .staff-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+        .staff-name-cell { display: flex; align-items: center; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo-mark">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 18V13M11 18V9M18 18V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4 13L11 9L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2>SMS</h2>
+                    <p>Student Management</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="super-admin-only">
+                        <a href="dashboard.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="3" width="7" height="9" rx="1.5"/>
+                                    <rect x="14" y="3" width="7" height="5" rx="1.5"/>
+                                    <rect x="14" y="12" width="7" height="9" rx="1.5"/>
+                                    <rect x="3" y="16" width="7" height="5" rx="1.5"/>
+                                </svg>
+                            </span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="students.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="8" r="3.5"/>
+                                    <path d="M4.5 20c0-3.6 3.36-6.5 7.5-6.5s7.5 2.9 7.5 6.5"/>
+                                </svg>
+                            </span>
+                            Students
+                        </a>
+                    </li>
+                                                            <li>
+                        <a href="inquiries.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 4.5h16v11.5a1.5 1.5 0 0 1-1.5 1.5H9l-4.5 4V4.5Z" stroke-linejoin="round"/>
+                                    <path d="M8 9h8M8 12.5h5"/>
+                                </svg>
+                            </span>
+                            Inquiries
+                        </a>
+                    </li>
+                    <li>
+                        <a href="batches.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 5.5C4 4.67 4.67 4 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z"/>
+                                    <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H12v16h6.5c.83 0 1.5-.67 1.5-1.5v-13Z"/>
+                                </svg>
+                            </span>
+                            Batches
+                        </a>
+                    </li>
+                    <li>
+                        <a href="enrollments.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="3.5" width="14" height="17" rx="1.5"/>
+                                    <path d="M9 3.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v.5"/>
+                                    <path d="M8.5 11l2 2 4-4.5M8.5 16.5h7"/>
+                                </svg>
+                            </span>
+                            Enrollments
+                        </a>
+                    </li>
+                    <li>
+                        <a href="certificates.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3.5" y="3.5" width="17" height="17" rx="2"/>
+                                    <path d="M8.5 12l2.3 2.3L15.5 9.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            Certificates
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="payments.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="6" width="18" height="13" rx="2"/>
+                                    <path d="M3 10h18"/>
+                                    <path d="M7 14.5h4"/>
+                                </svg>
+                            </span>
+                            Payments
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="expenses.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 3v3M12 18v3"/>
+                                    <circle cx="12" cy="12" r="8"/>
+                                    <path d="M9.5 15c0 1.1 1.1 2 2.5 2s2.5-.7 2.5-1.8-1.1-1.6-2.5-1.9-2.5-.8-2.5-1.9S10.6 9.6 12 9.6s2.5.7 2.5 1.7"/>
+                                </svg>
+                            </span>
+                            Expenses
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="staff.html" class="active">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="8.5" cy="7.5" r="3"/>
+                                    <path d="M2.5 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+                                    <path d="M15.5 4.7a3 3 0 0 1 0 5.6"/>
+                                    <path d="M17.5 14.3c2.2.55 3.8 2.4 3.8 5.7"/>
+                                </svg>
+                            </span>
+                            Staff
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="reports.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 20V10M11 20V4M18 20v-7"/>
+                                </svg>
+                            </span>
+                            Reports
+                        </a>
+                    </li>
+                    <li class="super-admin-only">
+                        <a href="users.html">
+                            <span class="nav-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="9" cy="8" r="3"/>
+                                    <path d="M3 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/>
+                                    <path d="M16 8.5a2.75 2.75 0 1 0 0-5.5"/>
+                                    <path d="M18.5 14c2.03.51 3.5 2.2 3.5 4.5"/>
+                                </svg>
+                            </span>
+                            Users
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">SA</div>
+                    <div class="user-details">
+                        <h4 id="userName">Super Admin</h4>
+                        <p id="userRole">Super Admin</p>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-block" id="logoutBtn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.12);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.75">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">Staff</h1>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="4.5"/>
+                            <path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Stats -->
+                <div class="stats-grid" id="staffStats">
+                    <div class="stat-card" style="--stat-accent: var(--brand-600);">
+                        <div class="stat-icon primary">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8.5" cy="7.5" r="3"/><path d="M2.5 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15.5 4.7a3 3 0 0 1 0 5.6"/><path d="M17.5 14.3c2.2.55 3.8 2.4 3.8 5.7"/></svg>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Total Staff</h4>
+                            <p id="statTotal">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="--stat-accent: var(--brand-600);">
+                        <div class="stat-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Active</h4>
+                            <p id="statActive">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="--stat-accent: var(--gold-600);">
+                        <div class="stat-icon warning">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="stat-info">
+                            <h4>On Leave</h4>
+                            <p id="statOnLeave">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="--stat-accent: var(--brick-600);">
+                        <div class="stat-icon danger">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Inactive</h4>
+                            <p id="statInactive">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="search-box">
+                            <span class="search-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="10.5" cy="10.5" r="6.5"/>
+                                    <path d="M20 20l-4.5-4.5" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            <input type="text" id="searchInput" placeholder="Search by name, mobile, course...">
+                        </div>
+                        <select id="designationFilter" class="form-control" style="width: auto;">
+                            <option value="">All Designations</option>
+                            <option value="Teacher">Teacher</option>
+                            <option value="Lab Assistant">Lab Assistant</option>
+                            <option value="Receptionist">Receptionist</option>
+                            <option value="Accountant">Accountant</option>
+                            <option value="Office Staff">Office Staff</option>
+                            <option value="Peon">Peon</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="statusFilter" class="form-control" style="width: auto;">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="On Leave">On Leave</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn btn-primary" id="addStaffBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+                            </svg>
+                            Add Staff
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Staff Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Staff ID</th>
+                                        <th>Name</th>
+                                        <th>Designation</th>
+                                        <th>Mobile</th>
+                                        <th>Course</th>
+                                        <th>Salary</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTableBody">
+                                    <tr><td colspan="8" class="text-center"><div class="spinner spinner-dark"></div> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Staff Modal -->
+    <div class="modal-overlay" id="staffModal" style="display: none;">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Staff</h3>
+                <button class="modal-close" id="closeModal">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="staffForm">
+                    <input type="hidden" id="staffRecordId">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" class="form-control" placeholder="Enter full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile">Mobile *</label>
+                            <input type="text" id="mobile" class="form-control" placeholder="10-digit mobile number" maxlength="10" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="alternateMobile">Alternate Mobile</label>
+                            <input type="text" id="alternateMobile" class="form-control" placeholder="10-digit mobile number" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Email address">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="designation">Designation *</label>
+                            <select id="designation" class="form-control" required>
+                                <option value="">Select Designation</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Lab Assistant">Lab Assistant</option>
+                                <option value="Receptionist">Receptionist</option>
+                                <option value="Accountant">Accountant</option>
+                                <option value="Office Staff">Office Staff</option>
+                                <option value="Peon">Peon</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="course">Course / Subject</label>
+                            <input type="text" id="course" class="form-control" placeholder="e.g., Web Development">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="salary">Salary (₹)</label>
+                            <input type="number" id="salary" class="form-control" placeholder="Monthly salary" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="joiningDate">Joining Date *</label>
+                            <input type="date" id="joiningDate" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" class="form-control">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="aadharNumber">Aadhar Number</label>
+                            <input type="text" id="aadharNumber" class="form-control" placeholder="12-digit Aadhar number" maxlength="12">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="On Leave">On Leave</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" class="form-control" placeholder="Enter address" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo">Photo</label>
+                        <input type="file" id="photo" class="form-control" accept="image/*">
+                        <div id="existingPhotoNote" style="display:none; margin-top:6px;">
+                            <small class="text-muted">Leave empty to keep the existing photo.</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" class="form-control" placeholder="Additional notes..." rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group" id="modalError" style="display: none;">
+                        <div class="alert alert-error"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveStaffBtn">
+                    <span id="saveBtnText">Save Staff</span>
+                    <span class="spinner" id="saveSpinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Staff Modal -->
+    <div class="modal-overlay" id="viewStaffModal" style="display: none;">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>Staff Details</h3>
+                <button class="modal-close" id="closeViewModal">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="staffDetails"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeViewBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/staff.js"></script>
+</body>
+</html>
